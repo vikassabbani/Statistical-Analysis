@@ -1,0 +1,165 @@
+---
+title: "Stats"
+output: html_document
+date: "2023-12-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("readxl")
+library(readxl)
+install.packages("dplyr")
+library(dplyr)
+df <- read_excel("C:/Users/vikas/Desktop/Playstore_cleaned.xlsx")
+attach(df)
+
+```
+
+```{r}
+install.packages("ggplot2")
+library(ggplot2)
+
+```
+
+```{r}
+set.seed(7)
+
+stratified_sample <- df %>%
+  sample_frac(0.5) %>%
+  as_tibble()
+
+```
+
+```{r}
+stratified_sample %>%
+  ggplot(aes(x = `In App Purchases`, y = Rating)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(breaks = seq(0, max(stratified_sample$Rating), by = 100))
+
+```
+
+```{r}
+# Assuming 'data' is your dataset
+model <- lm(stratified_sample$Rating ~ stratified_sample$`In App Purchases`)
+
+summary(model)
+```
+
+```{r}
+summary(model)$sigma^2
+```
+
+```{r}
+
+x = stratified_sample$Rating
+y = stratified_sample$`In App Purchases`
+
+
+sigma.t = sqrt(summary(model)$sigma^2)
+
+ME = qt(0.975, df = (length(y) - 2)) * sigma.t * sqrt(sum(x^2) / (length(x) * sum((x - mean(x))^2)))
+
+# Calculate the confidence interval for the intercept
+c_hat = mean(y) - (cor(x, y) * sd(y) / sd(x))
+c(4.104 - ME, 4.104 + ME)
+
+```
+
+```{r}
+x = stratified_sample$Rating
+y = stratified_sample$`In App Purchases`
+
+
+# Calculate the margin of error for the slope
+ME = qt(0.975, df = (length(y) - 2)) * sigma.t * sqrt(1 / sum((x - mean(x))^2))
+
+# Calculate the confidence interval for the slope
+beta1_hat = cor(x, y) * sd(y) / sd(x)
+c(beta1_hat - ME, beta1_hat + ME)
+
+```
+
+```{r}
+confint(model)
+```
+
+```{r}
+
+# Extract residuals
+residuals <- residuals(model)
+
+# Calculate standard deviation of residuals
+sigma.t <- sd(residuals)
+
+# Calculate t-statistic for beta1 (Rating coefficient)
+T0 <- coef(model)['Rating'] / (sigma.t * sqrt(sum(stratified_sample$Rating^2) / (nrow(stratified_sample) * sum((stratified_sample$Rating - mean(stratified_sample$Rating))^2))))
+
+# Compute p-value for two-tailed test
+result <- c(T0, 2 * pt(abs(T0), df = (nrow(stratified_sample) - 2)))
+
+# Print results
+cat("t-statistic:", result[1], "\n")
+cat("p-value:", result[2], "\n")
+# Check for missing values in 'Rating'
+if (any(is.na(stratified_sample$Rating))) {
+  stop("Missing values in 'Rating' variable.")
+}
+
+# Check for missing values in 'InAppPurchases'
+if (any(is.na(stratified_sample$InAppPurchases))) {
+  stop("Missing values in 'InAppPurchases' variable.")
+}
+
+# Extract residuals
+residuals <- residuals(model)
+
+# Calculate standard deviation of residuals
+sigma.t <- sd(residuals)
+
+# Calculate t-statistic for beta1 (Rating coefficient)
+T0 <- coef(model)['Rating'] / (sigma.t * sqrt(sum(stratified_sample$Rating^2) / (nrow(stratified_sample) * sum((stratified_sample$Rating - mean(stratified_sample$Rating))^2))))
+
+# Check for NA values in the result
+if (any(is.na(T0))) {
+  stop("NA values found in the result.")
+}
+
+# Compute p-value for two-tailed test
+result <- c(T0, 2 * pt(abs(T0), df =
+
+
+```
+
+```{r}
+# Check for missing values in 'Rating' and 'InAppPurchases'
+if (any(is.na(stratified_sample$Rating))) {
+  stop("Missing values in 'Rating' variable.")
+}
+
+if (any(is.na(stratified_sample$InAppPurchases))) {
+  stop("Missing values in 'InAppPurchases' variable.")
+}
+
+residuals <- residuals(model)
+
+# Calculate standard deviation of residuals
+sigma.t <- sd(residuals)
+
+# Calculate t-statistic for beta1 (Rating coefficient)
+T0 <- coef(model)['Rating'] / (sigma.t * sqrt(sum(stratified_sample$Rating^2) / (nrow(stratified_sample) * sum((stratified_sample$Rating - mean(stratified_sample$Rating))^2))))
+
+# Check for NA values in the result
+
+# Compute p-value for two-tailed test
+result <- c(T0, 2 * pt(abs(T0), df = (nrow(stratified_sample) - 2)))
+
+
+
+# Print results
+cat("t-statistic:", result[1], "\n")
+cat("p-value:", result[2], "\n")
+
+```
