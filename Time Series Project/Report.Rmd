@@ -1,0 +1,98 @@
+```{r}
+install.packages("dplyr")
+install.packages("seastests")
+install.packages("seasonal")
+install.packages(c("tseries", "stats"))
+```
+
+```{r}
+library(tseries)
+library(stats)
+library(seasonal)
+library(seastests)
+library(dplyr)
+library(ggplot2)
+library(readxl)
+library(lubridate)
+```
+
+```{r}
+data <- read_excel("C:\\Users\\vikas\\Desktop\\Term 3\\TS\\Project\\New_Cars.xlsx")
+
+data$Month <- as.Date(data$Month, format = "%m/%d/%Y")
+
+car_data <- filter(data, Month >= as.Date("2013-01-01"))
+```
+
+```{r}
+
+# Plot the time series data
+ggplot(car_data, aes(x = Month, y = Sales)) +
+  geom_line() +
+  labs(title = "Car Retail Sales Over Time",
+       x = "Month",
+       y = "Sales") +
+  theme_minimal()
+
+# Create a time series object
+ts_data <- ts(car_data$Sales, frequency = 12)
+
+# Decompose the time series using stl (Seasonal-Trend decomposition using Loess)
+decomposition <- stl(ts_data, s.window = "periodic")
+
+# Plot the decomposed components
+plot(decomposition)
+
+# Plot the seasonal component
+plot(decomposition$time.series[, "seasonal"], main = "Seasonal Component")
+
+# Plot the trend component
+plot(decomposition$time.series[, "trend"], main = "Trend Component")
+
+# Plot the remainder (residuals) component
+plot(decomposition$time.series[, "remainder"], main = "Residuals (Remainder) Component")
+```
+
+An upward trend indicates a general increase in the variable over time. The lower bump in the middle of the trend suggests a temporary deviation or anomaly. This could be due to specific events, factors, or external influences affecting the underlying upward movement.
+
+The deep groove in the residuals (remainder) where the trend graph has a bump indicates that the classical decomposition method might not fully capture the variation during that period. The residuals represent what is left after removing the trend and seasonal components. A deep groove suggests that there might be unexplained variation during that specific time, possibly due to outliers or irregularities.
+
+The magnitude of the seasonal pattern does not change significantly throughout the entire time series.
+
+```{r}
+# Summary statistics
+summary(ts_data)
+
+# Augmented Dickey-Fuller (ADF) test
+adf_test <- adf.test(ts_data)
+print(adf_test)
+```
+
+The negative Dickey-Fuller test statistic and the low p-value provide evidence that your time series is likely stationary. The Augmented Dickey-Fuller test supports the hypothesis that there is no unit root in your data, suggesting stationarity.
+
+```{r}
+# Create a time series object (replace 'your_data' with your actual time series data)
+ts_data <- ts(car_data$Sales, frequency = 12)
+
+# Perform decomposition using X-11 method
+decomposition <- decompose(ts_data, type = "additive")
+
+# Print the components
+print(decomposition)
+
+
+```
+
+```{r}
+your_data <- ts_data
+# Plot the original time series
+plot(your_data, main = "Original Time Series")
+
+# Plot the trend component
+plot(decomposition)
+```
+
+
+```{r}
+
+```
